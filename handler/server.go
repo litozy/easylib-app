@@ -27,6 +27,7 @@ func (s *server) Run() {
 	s.srv.Use(middleware.LoggerMiddleware())
 	s.srv.Use(sessions.Sessions("session", store))
 
+	NewLoginHandler(s.srv, s.usecaseManager.GetLoginUsecase())
 	NewUserHandler(s.srv, s.usecaseManager.GetUserUsecase())
 	s.srv.Run()
 
