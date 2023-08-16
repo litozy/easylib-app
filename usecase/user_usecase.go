@@ -15,7 +15,7 @@ import (
 
 type UserUsecase interface {
 	AddUser(*model.User) error
-	GetUserByUsername(string) (*model.User, error)
+	GetUserById(string) (*model.User, error)
 	UpdateUser(*model.User, *gin.Context) error
 	DeleteUser(string) error
 }
@@ -24,8 +24,8 @@ type userUsecase struct {
 	usrRepo repository.UserRepository
 }
 
-func (usrUseCase *userUsecase) GetUserByUsername(username string) (*model.User, error) {
-	return usrUseCase.usrRepo.GetUserByUsername(username)
+func (usrUseCase *userUsecase) GetUserById(id string) (*model.User, error) {
+	return usrUseCase.usrRepo.GetUserById(id)
 }
 
 func (usrUseCase *userUsecase) AddUser(usr *model.User) error {
@@ -59,9 +59,12 @@ func (usrUseCase *userUsecase) AddUser(usr *model.User) error {
 	if err != nil {
 		return err
     }
+	CreatedAt := time.Now().UTC()
+	UpdatedAt := time.Now().UTC()
+
 	usr.Id = uuid.New().String()
-	usr.CreatedAt = time.Now().UTC()
-	usr.UpdatedAt = time.Now().UTC()
+	usr.CreatedAt = CreatedAt.Format("2006-01-02 15:04:05")
+	usr.UpdatedAt = UpdatedAt.Format("2006-01-02 15:04:05")
 	usr.Password = string(hashedPassword)
    return usrUseCase.usrRepo.AddUser(usr)
 }
@@ -95,7 +98,8 @@ func (usrUseCase *userUsecase) UpdateUser(usr *model.User, ctx *gin.Context) err
 	if err != nil {
 		return fmt.Errorf("userUsecase.GenerateFromPassword(): %w", err)
 	}
-	usr.UpdatedAt = time.Now().UTC()
+	UpdatedAt := time.Now().UTC()
+	usr.UpdatedAt = UpdatedAt.Format("2006-01-02 15:04:05")
 	usr.Password = string(passHash)
 
 	return usrUseCase.usrRepo.UpdateUser(usr)

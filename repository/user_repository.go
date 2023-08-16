@@ -12,10 +12,25 @@ type UserRepository interface {
 	AddUser(*model.User) error
 	UpdateUser(*model.User) error
 	DeleteUser(string) error
+	GetUserById(string) (*model.User, error)
 }
 
 type userRepository struct {
 	db *sql.DB
+}
+
+func (usrRepo *userRepository) GetUserById(id string) (*model.User, error) {
+	qry := utils.SELECT_USER_BY_ID
+
+	usr := &model.User{}
+	err := usrRepo.db.QueryRow(qry, id).Scan(&usr.Id, &usr.Username, &usr.Password, &usr.CreatedAt, &usr.UpdatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("error on userRepository.GetUserByUsername() : %w", err)
+	}
+	return usr, nil
 }
 
 func (usrRepo *userRepository) GetUserByUsername(username string) (*model.User, error) {
@@ -45,7 +60,7 @@ func (usrRepo *userRepository) AddUser(usr *model.User) error {
 func (usrRepo *userRepository) UpdateUser(usr *model.User) error {
 	qry := utils.UPDATE_USER
 
-	_, err := usrRepo.db.Exec(qry, &usr.Username, &usr.Password, &usr.CreatedAt, &usr.UpdatedAt, &usr.Id)
+	_, err := usrRepo.db.Exec(qry, &usr.Username, &usr.Password, &usr.UpdatedAt, &usr.Id)
 	if err != nil {
 		return fmt.Errorf("error on userRepository.UpdateUser() : %w", err)
 	}

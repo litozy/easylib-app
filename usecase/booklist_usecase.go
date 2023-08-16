@@ -33,8 +33,9 @@ func (bkUsecase *bookListUsecase) InsertBook(bk *model.Book, ctx *gin.Context) e
 	session := sessions.Default(ctx)
 	existSession := session.Get("Username")
 
+	CreatedAt := time.Now().UTC()
 	bk.Id = utils.UuidGenerate()
-	bk.CreatedAt = time.Now().UTC()
+	bk.CreatedAt = CreatedAt.Format("2006-01-02 15:04:05")
 	bk.CreatedBy = existSession.(string)
 	return bkUsecase.bkRepo.InsertBook(bk)
 }

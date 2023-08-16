@@ -9,6 +9,7 @@ type UsecaseManager interface {
 	GetUserUsecase() usecase.UserUsecase
 	GetLoginUsecase() usecase.LoginUseCase
 	GetBookListUsecase() usecase.BookListUsecase
+	GetImageUsecase() usecase.ImagesUsecase
 }
 
 type usecaseManager struct {
@@ -16,11 +17,13 @@ type usecaseManager struct {
 	usrUsecase        usecase.UserUsecase
 	lgUsecase     usecase.LoginUseCase
 	bkUsecase  	usecase.BookListUsecase
+	imgUsecase usecase.ImagesUsecase
 }
 
 var onceLoadUserUsecase sync.Once
 var onceLoadLoginUsecase sync.Once
 var onceLoadBookListUsecase sync.Once
+var onceLoadImageUsecase sync.Once
 
 func (um *usecaseManager) GetUserUsecase() usecase.UserUsecase {
 	onceLoadUserUsecase.Do(func() {
@@ -42,6 +45,14 @@ func (um *usecaseManager) GetBookListUsecase() usecase.BookListUsecase {
 
 	})
 	return um.bkUsecase
+}
+
+func (um *usecaseManager) GetImageUsecase() usecase.ImagesUsecase {
+	onceLoadImageUsecase.Do(func() {
+		um.imgUsecase = usecase.NewImagesUsecase(um.repositoryManager.GetImageRepository())
+
+	})
+	return um.imgUsecase
 }
 
 func NewUsecaseManager(repositoryManager RepositoryManager) UsecaseManager {

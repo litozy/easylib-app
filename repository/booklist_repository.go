@@ -90,7 +90,7 @@ func (bkRepo *bookListRepository) UpdateBook(bk *model.Book) error {
 // 	return bk, nil
 // }
 
-func NewBookRepo(db *sql.DB) BookListRepository {
+func NewBookRepository(db *sql.DB) BookListRepository {
 	return &bookListRepository{
 		db: db,
 	}

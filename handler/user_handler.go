@@ -18,10 +18,10 @@ type UserHandler struct {
 	usrUseCase usecase.UserUsecase
 }
 
-func (usrHandler UserHandler) GetUserByUsername(ctx *gin.Context) {
+func (usrHandler UserHandler) GetUserById(ctx *gin.Context) {
 	session := sessions.Default(ctx)
-	existSession := session.Get("Username")
-	userName, ok := existSession.(string)
+	existSession := session.Get("Id")
+	id, ok := existSession.(string)
 	if !ok {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"success":      false,
@@ -29,17 +29,17 @@ func (usrHandler UserHandler) GetUserByUsername(ctx *gin.Context) {
 		})
 		return
 	}
-	usr, err := usrHandler.usrUseCase.GetUserByUsername(userName)
+	usr, err := usrHandler.usrUseCase.GetUserById(id)
 	if err != nil {
 		appError := &utils.AppError{}
 		if errors.As(err, &appError) {
-			fmt.Printf("UserHandler.GetUserByName() 1: %v", err.Error())
+			fmt.Printf("UserHandler.GetUserById() 1: %v", err.Error())
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"success":      false,
 				"errorMessage": appError.Error(),
 			})
 		} else {
-			fmt.Printf("UserHandler.GetUserByName() 2: %v", err.Error())
+			fmt.Printf("UserHandler.GetUserById() 2: %v", err.Error())
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"success":      false,
 				"errorMessage": err.Error(),
@@ -123,7 +123,7 @@ func (usrHandler UserHandler) UpdateUser(ctx *gin.Context) {
 			fmt.Printf("UserHandler.UpdateUser() 2: %v", err.Error())
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"success":      false,
-				"errorMessage": "An error occurred while saving user data",
+				"errorMessage": "An error occurred while updating user data",
 			})
 		}
 		return
@@ -167,7 +167,7 @@ func NewUserHandler(srv *gin.Engine, usrUseCase usecase.UserUsecase) *UserHandle
 	// route
 	srv.POST("/user", usrHandler.AddUser)
 	srv.PUT("/user", middleware.RequireToken(), usrHandler.UpdateUser)
-	srv.GET("/user", middleware.RequireToken(), usrHandler.GetUserByUsername)
+	srv.GET("/user", middleware.RequireToken(), usrHandler.GetUserById)
 	srv.DELETE("/user", middleware.RequireToken(), usrHandler.DeleteUser)
 	return usrHandler
 }

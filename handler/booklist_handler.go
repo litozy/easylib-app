@@ -26,7 +26,7 @@ func (bkHandler BookHandler) GetBookById(ctx *gin.Context) {
 
 	bk, err := bkHandler.bkUsecase.GetBookById(idText)
 	if err != nil {
-		fmt.Printf("BookHandler.GetBookById() : %v ", err.Error())
+		fmt.Printf("bkHandler.GetBookById() : %v ", err.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"success":      false,
 			"errorMessage": "There was an error getting the book data",
@@ -68,7 +68,7 @@ func (bkHandler BookHandler) InsertBook(ctx *gin.Context) {
 	}
 	err = bkHandler.bkUsecase.InsertBook(bk, ctx)
 	if err != nil {
-		fmt.Printf("BookHandler.InsertBook() : %v ", err.Error())
+		fmt.Printf("bkHandler.InsertBook() : %v ", err.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"success":      false,
 			"errorMessage": "There was error inserting book",
@@ -77,6 +77,7 @@ func (bkHandler BookHandler) InsertBook(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
+		"message": "Book successfully inserted",
 	})
 }
 
@@ -92,16 +93,17 @@ func (bkHandler BookHandler) DeleteBook(ctx *gin.Context) {
 
 	err := bkHandler.bkUsecase.DeleteBook(idText)
 	if err != nil {
-		fmt.Printf("bkHandler.bkUseCase.getAllBook() : %v", err.Error())
+		fmt.Printf("bkHandler.bkUseCase.DeleteBook() : %v", err.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"success":      false,
-			"errorMessage": "Terjadi kesalahan dalam menghapus data Book",
+			"errorMessage": "There was error deleting book",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
+		"message": "Book successfully deleted",
 	})
 }
 
@@ -128,6 +130,7 @@ func (bkHandler BookHandler) UpdateBook(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
+		"message": "Book successfully updated",
 	})
 }
 

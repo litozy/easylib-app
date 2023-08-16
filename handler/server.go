@@ -30,6 +30,7 @@ func (s *server) Run() {
 	NewLoginHandler(s.srv, s.usecaseManager.GetLoginUsecase())
 	NewUserHandler(s.srv, s.usecaseManager.GetUserUsecase())
 	NewBookHandler(s.srv, s.usecaseManager.GetBookListUsecase())
+	NewImageHandler(s.srv, s.usecaseManager.GetImageUsecase())
 	s.srv.Run()
 
 }
