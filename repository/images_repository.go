@@ -8,24 +8,24 @@ import (
 )
 
 type ImagesRepository interface {
-	GetImageById(string) (*model.Images, error)
+	GetImageById(string) (model.Images, error)
 	InsertImage(model.Images) model.Images
-	DeleteImage(string) error
+	DeleteImage(model.Images) error
 }
 
 type imagesRepository struct {
 	db *sql.DB
 }
 
-func (imgRepo *imagesRepository) GetImageById(id string) (*model.Images, error) {
+func (imgRepo *imagesRepository) GetImageById(id string) (model.Images, error) {
 	qry := utils.GET_IMAGE_BY_ID
-	img := &model.Images{}
+	img := model.Images{}
 	err := imgRepo.db.QueryRow(qry, id).Scan(&img.Id, &img.Path, &img.CreatedAt, &img.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil
+			panic(err)
 		}
-		return nil, fmt.Errorf("error on imagesRepository.getImageById() : %v", err)
+		panic(err)
 	}
 	return img, nil
 }
@@ -39,9 +39,9 @@ func (imgRepo *imagesRepository) InsertImage(img model.Images) model.Images {
 	return img
 }
 
-func (imgRepo *imagesRepository) DeleteImage(id string) error {
+func (imgRepo *imagesRepository) DeleteImage(img model.Images) error {
 	qry := utils.DELETE_IMAGE
-	_, err := imgRepo.db.Exec(qry, id)
+	_, err := imgRepo.db.Exec(qry, img.Id)
 	if err != nil {
 		return fmt.Errorf("error on imagesRepository.DeleteImage : %v", err)
 	}

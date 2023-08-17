@@ -4,7 +4,6 @@ import (
 	"easylib-go/model"
 	"easylib-go/repository"
 	"easylib-go/utils"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -13,8 +12,8 @@ import (
 
 type ImagesUsecase interface {
 	InsertImage(model.ImageCreateRequest) []model.ImageResponse
-	DeleteImage(string) error
-	GetImageById(string) (*model.Images, error)
+	DeleteImage(string)
+	GetImageById(id string) model.ImageResponse
 }
 
 type imagesUsecase struct {
@@ -58,18 +57,23 @@ func (imgUsecase *imagesUsecase) InsertImage(req model.ImageCreateRequest) []mod
 	return imageResponses
 } 
 
-func (imgUsecase *imagesUsecase) DeleteImage(id string) error {
-	image, _ := imgUsecase.imgRepo.GetImageById(id)
-	if image == nil {
-		return fmt.Errorf("user %v does not exist", id)
+func (imgUsecase *imagesUsecase) DeleteImage(id string) {
+	image, err := imgUsecase.imgRepo.GetImageById(id)
+	if err != nil {
+		panic(err.Error())
 	}
-	os.Remove("public/" + image.Path)
 
-	return imgUsecase.imgRepo.DeleteImage(id)
+	imgUsecase.imgRepo.DeleteImage(image)
+
+	os.Remove("public/" + image.Path)
 }
 
-func (imgUsecase *imagesUsecase) GetImageById(id string) (*model.Images, error) {
-	return imgUsecase.imgRepo.GetImageById(id)
+func (imgUsecase *imagesUsecase) GetImageById(id string) model.ImageResponse {
+	image, err := imgUsecase.imgRepo.GetImageById(id)
+	if err != nil {
+		panic(err)
+	}
+	return utils.ToImageResponse(image)
 }
 
 func NewImagesUsecase(imgRepo repository.ImagesRepository) ImagesUsecase {
