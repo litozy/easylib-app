@@ -27,7 +27,7 @@ CREATE TABLE member (
 	phone_no VARCHAR(50) NOT NULL,
 	no_identity VARCHAR(50) NOT NULL,
 	image_id TEXT NOT NULL,
-	loan_status VARCHAR(50) NOT NULL,
+	loan_status BOOLEAN,
 	created_at TIMESTAMP,
 	updated_at TIMESTAMP,
 	created_by VARCHAR(50) NOT NULL,

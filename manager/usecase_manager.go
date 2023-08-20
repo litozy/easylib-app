@@ -9,7 +9,7 @@ type UsecaseManager interface {
 	GetUserUsecase() usecase.UserUsecase
 	GetLoginUsecase() usecase.LoginUseCase
 	GetBookListUsecase() usecase.BookListUsecase
-	GetImageUsecase() usecase.ImagesUsecase
+	GetMemberUsecase() usecase.MembersUsecase
 }
 
 type usecaseManager struct {
@@ -17,13 +17,15 @@ type usecaseManager struct {
 	usrUsecase        usecase.UserUsecase
 	lgUsecase     usecase.LoginUseCase
 	bkUsecase  	usecase.BookListUsecase
-	imgUsecase usecase.ImagesUsecase
+	mmbUsecase usecase.MembersUsecase
 }
 
 var onceLoadUserUsecase sync.Once
 var onceLoadLoginUsecase sync.Once
 var onceLoadBookListUsecase sync.Once
 var onceLoadImageUsecase sync.Once
+var onceLoadMemberUsecase sync.Once
+
 
 func (um *usecaseManager) GetUserUsecase() usecase.UserUsecase {
 	onceLoadUserUsecase.Do(func() {
@@ -47,12 +49,12 @@ func (um *usecaseManager) GetBookListUsecase() usecase.BookListUsecase {
 	return um.bkUsecase
 }
 
-func (um *usecaseManager) GetImageUsecase() usecase.ImagesUsecase {
-	onceLoadImageUsecase.Do(func() {
-		um.imgUsecase = usecase.NewImagesUsecase(um.repositoryManager.GetImageRepository())
+func (um *usecaseManager) GetMemberUsecase() usecase.MembersUsecase {
+	onceLoadMemberUsecase.Do(func() {
+		um.mmbUsecase = usecase.NewMembersUsecase(um.repositoryManager.GetMemberRepository())
 
 	})
-	return um.imgUsecase
+	return um.mmbUsecase
 }
 
 func NewUsecaseManager(repositoryManager RepositoryManager) UsecaseManager {

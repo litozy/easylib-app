@@ -22,8 +22,10 @@ const (
 	UPDATE_IMAGE    = "UPDATE images SET path = $2, updated_at = $3 WHERE id = $1"
 
 	//MEMBER
-	GET_MEMBER_BY_ID = "SELECT id, name, phone_no, no_identity, image_path, loan_status, created_at, updated_at, created_by FROM member WHERE id = $1"
-	INSERT_MEMBER    = "INSERT INTO member (id, name, phone_no, no_identity, image_path, loan_status, created_at, updated_at, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"
-	DELETE_MEMBER    = "DELETE FROM member WHERE id = $1"
-	UPDATE_MEMBER    = "UPDATE images SET name = $2, phone_no = $3, no_identity = $4, image_path = $5, loan_status = $6, created_at = $7, updated_at = $8, created_by = $9 WHERE id = $1"
+	GET_MEMBER_BY_ID       = "SELECT id, name, phone_no, no_identity, image_path, loan_status, created_at, updated_at, created_by FROM member WHERE id = $1"
+	GET_MEMBER_BY_PHONENO  = "SELECT id, name, phone_no, no_identity, image_path, loan_status, created_at, updated_at, created_by FROM member WHERE phone_no = $1"
+	GET_MEMBER_BY_IDMEMBER = "SELECT id, name, phone_no, no_identity, image_path, loan_status, created_at, updated_at, created_by FROM member WHERE no_identity = $1"
+	INSERT_MEMBER          = "INSERT INTO member (id, name, phone_no, no_identity, image_path, loan_status, created_at, updated_at, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"
+	DELETE_MEMBER          = "DELETE FROM member WHERE id = $1"
+	UPDATE_MEMBER          = "UPDATE images SET name = $2, phone_no = $3, no_identity = $4, image_path = $5, loan_status = $6, created_at = $7, updated_at = $8, created_by = $9 WHERE id = $1"
 )

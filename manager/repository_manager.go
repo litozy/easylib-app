@@ -8,19 +8,20 @@ import (
 type RepositoryManager interface {
 	GetUserRepository() repository.UserRepository
 	GetBookRepository() repository.BookListRepository
-	GetImageRepository() repository.ImagesRepository
+	GetMemberRepository() repository.MemberRepository
 }
 
 type repositoryManager struct {
 	infraManager InfraManager
 	usrRepo repository.UserRepository
 	bkRepo repository.BookListRepository
-	imgRepo repository.ImagesRepository
+	mmbRepo repository.MemberRepository
 }
 
 var onceLoadUserRepo sync.Once
 var onceLoadBookRepo sync.Once
 var onceLoadImageRepo sync.Once
+var onceLoadMemberRepo sync.Once
 
 func (rm *repositoryManager) GetUserRepository() repository.UserRepository {
 	onceLoadUserRepo.Do(func() {
@@ -36,11 +37,11 @@ func (rm *repositoryManager) GetBookRepository() repository.BookListRepository {
 	return rm.bkRepo
 }
 
-func (rm *repositoryManager) GetImageRepository() repository.ImagesRepository {
-	onceLoadImageRepo.Do(func() {
-		rm.imgRepo = repository.NewImageRepository(rm.infraManager.GetDB())
+func (rm *repositoryManager) GetMemberRepository() repository.MemberRepository {
+	onceLoadMemberRepo.Do(func() {
+		rm.mmbRepo = repository.NewMemberRepository(rm.infraManager.GetDB())
 	})
-	return rm.imgRepo
+	return rm.mmbRepo
 }
 
 func NewRepoManager(infraManager InfraManager) RepositoryManager {

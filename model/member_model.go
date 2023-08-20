@@ -10,7 +10,7 @@ type Member struct {
 	PhoneNo    string
 	NoIdentity string
 	ImagePath  string
-	LoanStatus string
+	LoanStatus bool
 	CreatedAt  string
 	UpdatedAt  string
 	CreatedBy  string
@@ -25,7 +25,7 @@ type MemberResponse struct {
 	Name 	   string `json:"name"`
 	PhoneNo    string `json:"phone_no"`
 	NoIdentity string `json:"no_identity"`
-	ImagePath  string `json:"image_path"`
+	ImagePath  string `json:"image_id"`
 	LoanStatus string `json:"loan_status"`
 	CreatedAt  string `json:"created_at"`
 	UpdatedAt  string `json:"updated_at"`

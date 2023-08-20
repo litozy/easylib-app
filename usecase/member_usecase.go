@@ -4,6 +4,7 @@ import (
 	"easylib-go/model"
 	"easylib-go/repository"
 	"easylib-go/utils"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -14,77 +15,145 @@ import (
 )
 
 type MembersUsecase interface {
-	InsertMember(*gin.Context, *model.Member, model.MemberCreateRequest) []model.MemberResponse
-	DeleteMember(string)
-	GetMemberById(string) model.MemberResponse
+	InsertMember(mmb *model.Member, ctx *gin.Context, req model.MemberCreateRequest) error
+	UpdateMember(mmb *model.Member, ctx *gin.Context, req model.MemberCreateRequest) error
+	DeleteMember(id string) error
+	GetMemberById(id string) (*model.Member, error)
 }
 
 type memberUsecase struct {
 	mmbRepo repository.MemberRepository
 }
 
-func (mmbUsecase *memberUsecase) InsertMember(ctx *gin.Context, mem *model.Member, req model.MemberCreateRequest) []model.MemberResponse {
+func (mmbUsecase *memberUsecase) InsertMember(mmb *model.Member, ctx *gin.Context, req model.MemberCreateRequest) error {
+
 	session := sessions.Default(ctx)
 	existSession := session.Get("Username")
-	var imageResponses []model.MemberResponse
 
-	for _, member := range req.FormData { // Menggunakan variable 'member' yang sesuai dengan loop saat ini
-		file, _ := member.Open() // Menggunakan 'member.Image' untuk mendapatkan gambar
+	for _, member := range req.FormData {
 
-		tempFile, err := os.CreateTemp("public", "image-*.jpg")
-		if err != nil {
-			panic(err)
-		}
-		defer tempFile.Close()
+	file, _ := member.Open()
 
-		fileBytes, err := io.ReadAll(file)
-		if err != nil {
-			panic(err)
-		}
-
-		tempFile.Write(fileBytes)
-
-		fileName := tempFile.Name()
-		newFileName := strings.Split(fileName, "\\")
-
-		CreatedAt := time.Now().UTC()
-		UpdatedAt := time.Now().UTC()
-		newMember := model.Member{ // Menggunakan 'newMember' untuk menyimpan data anggota baru
-			Id:         utils.UuidGenerate(),
-			Name:       mem.Name,
-			PhoneNo:    mem.PhoneNo,
-			NoIdentity: mem.NoIdentity,
-			ImagePath:  newFileName[1],
-			LoanStatus: mem.LoanStatus,
-			CreatedAt:  CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:  UpdatedAt.Format("2006-01-02 15:04:05"),
-			CreatedBy:  existSession.(string),
-		}
-
-		newMember = mmbUsecase.mmbRepo.InsertMember(newMember) // Memasukkan data anggota baru ke dalam repository
-		imageResponses = append(imageResponses, utils.ToMemberResponse(newMember))
-	}
-	return imageResponses
-}
-
-
-func (mmbUsecase *memberUsecase) DeleteMember(id string) {
-	image, err := mmbUsecase.mmbRepo.GetMemberById(id)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	mmbUsecase.mmbRepo.DeleteMember(image)
-
-	os.Remove("public/" + image.ImagePath)
-}
-
-func (mmbUsecase *memberUsecase) GetMemberById(id string) model.MemberResponse {
-	image, err := mmbUsecase.mmbRepo.GetMemberById(id)
+	tempFile, err := os.CreateTemp("public", "image-*.jpg")
 	if err != nil {
 		panic(err)
 	}
-	return utils.ToMemberResponse(image)
+	defer tempFile.Close()
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+			panic(err)
+	}
+
+	tempFile.Write(fileBytes)
+
+	fileName := tempFile.Name()
+	newFileName := strings.Split(fileName, "\\")
+
+	existPhoneNo, _ := mmbUsecase.mmbRepo.GetMemberByPhoneNumber(mmb.PhoneNo)
+	if existPhoneNo != nil {
+		return &utils.AppError{
+			ErrorCode: 1,
+			ErrorMessage: fmt.Sprintf("User data with the PhoneNo %v already exists", existPhoneNo.PhoneNo),
+		}
+	}
+	existIdMember, _ := mmbUsecase.mmbRepo.GetMemberByIdMember(mmb.NoIdentity)
+	if existIdMember != nil {
+		return &utils.AppError{
+			ErrorCode: 1,
+			ErrorMessage: fmt.Sprintf("User data with the NoIdentity %v already exists", existIdMember.NoIdentity),
+		}
+	}
+
+	CreatedAt := time.Now().UTC()
+	UpdatedAt := time.Now().UTC()
+	mmb.LoanStatus = false
+	mmb.ImagePath = newFileName[1]
+	mmb.Id = utils.UuidGenerate()
+	mmb.CreatedAt = CreatedAt.Format("2006-01-02 15:04:05")
+	mmb.UpdatedAt = UpdatedAt.Format("2006-01-02 15:04:05")
+	mmb.CreatedBy = existSession.(string)
+	}
+
+	return mmbUsecase.mmbRepo.InsertMember(mmb)
+}
+
+func (mmbUsecase *memberUsecase) UpdateMember(mmb *model.Member, ctx *gin.Context, req model.MemberCreateRequest) error {
+	session := sessions.Default(ctx)
+	existSession := session.Get("Username")
+
+	for _, member := range req.FormData {
+
+	file, _ := member.Open()
+
+	tempFile, err := os.CreateTemp("public", "image-*.jpg")
+	if err != nil {
+		panic(err)
+	}
+	defer tempFile.Close()
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+			panic(err)
+	}
+
+	tempFile.Write(fileBytes)
+
+	fileName := tempFile.Name()
+	newFileName := strings.Split(fileName, "\\")
+
+	existPhoneNo, _ := mmbUsecase.mmbRepo.GetMemberByPhoneNumber(mmb.PhoneNo)
+	if existPhoneNo != nil {
+		return &utils.AppError{
+			ErrorCode: 1,
+			ErrorMessage: fmt.Sprintf("User data with the PhoneNo %v already exists", existPhoneNo.PhoneNo),
+		}
+	}
+	existIdMember, _ := mmbUsecase.mmbRepo.GetMemberByIdMember(mmb.NoIdentity)
+	if existIdMember != nil {
+		return &utils.AppError{
+			ErrorCode: 1,
+			ErrorMessage: fmt.Sprintf("User data with the NoIdentity %v already exists", existIdMember.NoIdentity),
+		}
+	}
+
+	UpdatedAt := time.Now().UTC()
+	mmb.LoanStatus = false
+	mmb.ImagePath = newFileName[1]
+	mmb.UpdatedAt = UpdatedAt.Format("2006-01-02 15:04:05")
+	mmb.CreatedBy = existSession.(string)
+	}
+
+	return mmbUsecase.mmbRepo.UpdateMember(mmb)
+}
+
+func (mmbUsecase *memberUsecase) GetMemberById(id string) (*model.Member, error) {
+	 member, err := mmbUsecase.mmbRepo.GetMemberById(id)
+	 if err != nil {
+		return nil, fmt.Errorf("error on mmbUsecase.mmbRepo.GetMemberById() : %w ", err)
+	 }
+
+	 if member == nil {
+		return nil, &utils.AppError{
+			ErrorCode: 4,
+			ErrorMessage: fmt.Sprintf("Member with id %s not found", id),
+		}
+	 }
+
+	 return member, nil
+}
+
+func (mmbUsecase *memberUsecase) DeleteMember(id string) error {
+	member, err := mmbUsecase.mmbRepo.GetMemberById(id)
+	if err != nil {
+		return fmt.Errorf("error on mmbUsecase.mmbRepo.DeleteMember: %v", err)
+	}
+
+	mmbUsecase.mmbRepo.DeleteMember(member)
+
+	os.Remove("public/" + member.ImagePath)
+
+	return nil
 }
 
 func NewMembersUsecase(mmbRepo repository.MemberRepository) MembersUsecase {
