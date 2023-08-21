@@ -1,30 +1,24 @@
 package model
 
-import "time"
-
 type BookLoan struct {
-	Id        string
-	MemberId  string
-	BookId    []string
-	StartDate time.Time
-	EndDate time.Time
-	LateChargeDay int
-	LateCharge float64
+	Id         string
+	MemberId   string
+	BookId     []string
+	StartDate  string
+	EndDate    string
 	LoanStatus string
 }
 
 type BookLoanView struct {
-	Name string
+	Id         string
+	Name       string
 	LoanStatus string
-	LateChargeTotal float64
-	Loaning []BookLoanViewDetail
+	Loaning    []BookLoanViewDetail
 }
 
 type BookLoanViewDetail struct {
-	BookName string
-	StartDate time.Time
-	EndDate time.Time
-	LateChargeDay int
-	LateCharge float64
+	BookName   string
+	StartDate  string
+	EndDate    string
 	LoanStatus string
 }

@@ -4,6 +4,8 @@ import (
 	"easylib-go/middleware"
 	"easylib-go/model"
 	"easylib-go/usecase"
+	"easylib-go/utils"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -13,6 +15,22 @@ import (
 
 type MembersHandler struct {
 	mmbUsecase usecase.MembersUsecase
+}
+
+func (mmbHandler *MembersHandler) GetAllMembers(ctx *gin.Context) {
+	mmb, err := mmbHandler.mmbUsecase.GetAllMember()
+	if err != nil {
+		fmt.Printf("mmbHandler.mmbUseCase.getAllMember() : %v", err.Error())
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"errorMessage": "There was an error while getting the member data",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    mmb,
+	})
 }
 
 func (mmbHandler *MembersHandler) InsertMember(ctx *gin.Context) {
@@ -32,11 +50,20 @@ func (mmbHandler *MembersHandler) InsertMember(ctx *gin.Context) {
 	}
 	err = mmbHandler.mmbUsecase.InsertMember(mmb, ctx, req)
 	if err != nil {
-		fmt.Printf("mmbHandler.InsertMember() : %v ", err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"success":      false,
-			"errorMessage": "There was error inserting member data",
-		})
+		appError := &utils.AppError{}
+		if errors.As(err, &appError) {
+			fmt.Printf("mmbHandler.mmbUsecase.InsertMember() 1: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": appError.Error(),
+			})
+		} else {
+			fmt.Printf("mmbHandler.mmbUsecase.InsertMember() 2: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": "An error occurred while inserting member data",
+			})
+		}
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
@@ -62,11 +89,20 @@ func (mmbHandler *MembersHandler) UpdateMember(ctx *gin.Context) {
 	}
 	err = mmbHandler.mmbUsecase.UpdateMember(mmb, ctx, req)
 	if err != nil {
-		fmt.Printf("mmbHandler.InsertMember() : %v ", err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"success":      false,
-			"errorMessage": "There was error inserting member data",
-		})
+		appError := &utils.AppError{}
+		if errors.As(err, &appError) {
+			fmt.Printf("mmbHandler.mmbUsecase.UpdateMember() 1: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": appError.Error(),
+			})
+		} else {
+			fmt.Printf("mmbHandler.mmbUsecase.UpdateMember() 2: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": "An error occurred while updating member data",
+			})
+		}
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
@@ -88,12 +124,21 @@ func (mmbHandler *MembersHandler) GetMemberImageById(ctx *gin.Context) {
 	exampleResponse, _ := mmbHandler.mmbUsecase.GetMemberById(idText)
 	fileBytes, err := os.ReadFile("public/" + exampleResponse.ImagePath)
 	if err != nil {
-		fmt.Printf("imgHandler.GetImageById() : %v ", err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"success":      false,
-			"errorMessage": "There was an error getting the image data",
-		})
-		return 
+		appError := &utils.AppError{}
+		if errors.As(err, &appError) {
+			fmt.Printf("mmbHandler.mmbUsecase.GetMemberImageById() 1: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": appError.Error(),
+			})
+		} else {
+			fmt.Printf("mmbHandler.mmbUsecase.GetMemberImageById() 2: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": "An error occurred while getting member image",
+			})
+		}
+		return
 	}
 	// ctx.JSON(http.StatusOK, gin.H{
 	// 	"success": true,
@@ -114,11 +159,20 @@ func (mmbHandler *MembersHandler) GetMemberDataById(ctx *gin.Context) {
 
 	mmb, err := mmbHandler.mmbUsecase.GetMemberById(idText)
 	if err != nil {
-		fmt.Printf("mmbHandler.GetMemberById() : %v ", err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"success":      false,
-			"errorMessage": "There was an error getting the member data",
-		})
+		appError := &utils.AppError{}
+		if errors.As(err, &appError) {
+			fmt.Printf("mmbHandler.mmbUsecase.GetMemberById() 1: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": appError.Error(),
+			})
+		} else {
+			fmt.Printf("mmbHandler.mmbUsecase.GetMemberMemberById() 2: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": "An error occurred while getting member data",
+			})
+		}
 		return
 	}
 
@@ -139,7 +193,24 @@ func (mmbHandler *MembersHandler) DeleteMember(ctx *gin.Context) {
 		return
 	}
 
-    mmbHandler.mmbUsecase.DeleteMember(idText)
+    err := mmbHandler.mmbUsecase.DeleteMember(idText)
+	if err != nil {
+		appError := &utils.AppError{}
+		if errors.As(err, &appError) {
+			fmt.Printf("mmbHandler.mmbUsecase.DeleteMember() 1: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": appError.Error(),
+			})
+		} else {
+			fmt.Printf("mmbHandler.mmbUsecase.DeleteMember() 2: %v", err.Error())
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"success":      false,
+				"errorMessage": "An error occurred while deleting member data",
+			})
+		}
+		return
+	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Member successfully deleted",
@@ -148,6 +219,7 @@ func (mmbHandler *MembersHandler) DeleteMember(ctx *gin.Context) {
 
 func NewMemberHandler(srv *gin.Engine, mmbUsecase usecase.MembersUsecase) *MembersHandler {
 	mmbHandler := &MembersHandler{mmbUsecase: mmbUsecase}
+	srv.GET("/member", middleware.RequireToken(), mmbHandler.GetAllMembers)
 	srv.GET("/memberimg/:id", middleware.RequireToken(), mmbHandler.GetMemberImageById)
 	srv.POST("/member", middleware.RequireToken(), mmbHandler.InsertMember)
 	srv.DELETE("/member/:id", middleware.RequireToken(), mmbHandler.DeleteMember)

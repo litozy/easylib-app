@@ -14,6 +14,7 @@ type MemberRepository interface {
 	UpdateMember(*model.Member) error
 	GetMemberByPhoneNumber(phoneno string) (*model.Member, error)
 	GetMemberByIdMember(idmem string) (*model.Member, error)
+	GetAllMember() ([]*model.Member, error)
 }
 
 type memberRepository struct {
@@ -44,6 +45,23 @@ func (mmbRepo *memberRepository) GetMemberByIdMember(idmem string) (*model.Membe
 		return nil, nil
 	}
 	return mmb, nil
+}
+
+func (mmbRepo *memberRepository) GetAllMember() ([]*model.Member, error) {
+	qry := utils.GET_ALL_MEMBER
+	var arrMember []*model.Member
+	rows, err := mmbRepo.db.Query(qry)
+	if err != nil {
+		return nil, fmt.Errorf("error on memberRepository.GetAllMember() : %v", err)
+	}
+
+	for rows.Next() {
+		mmb := &model.Member{}
+		rows.Scan(&mmb.Id, &mmb.Name, &mmb.PhoneNo, &mmb.NoIdentity, &mmb.ImagePath, &mmb.LoanStatus, &mmb.CreatedAt, &mmb.UpdatedAt, &mmb.CreatedBy)
+		arrMember = append(arrMember, mmb)
+	}
+	return arrMember, nil
+
 }
 
 func (mmbRepo *memberRepository) GetMemberById(id string) (*model.Member, error) {

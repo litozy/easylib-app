@@ -19,6 +19,7 @@ type MembersUsecase interface {
 	UpdateMember(mmb *model.Member, ctx *gin.Context, req model.MemberCreateRequest) error
 	DeleteMember(id string) error
 	GetMemberById(id string) (*model.Member, error)
+	GetAllMember() ([]*model.Member, error)
 }
 
 type memberUsecase struct {
@@ -32,6 +33,21 @@ func (mmbUsecase *memberUsecase) InsertMember(mmb *model.Member, ctx *gin.Contex
 
 	for _, member := range req.FormData {
 
+	existPhoneNo, _ := mmbUsecase.mmbRepo.GetMemberByPhoneNumber(mmb.PhoneNo)
+	if existPhoneNo != nil {
+		return &utils.AppError{
+				ErrorCode: 1,
+				ErrorMessage: fmt.Sprintf("User data with the PhoneNo %v already exists", existPhoneNo.PhoneNo),
+		}
+	}
+	existIdMember, _ := mmbUsecase.mmbRepo.GetMemberByIdMember(mmb.NoIdentity)
+	if existIdMember != nil {
+		return &utils.AppError{
+			ErrorCode: 1,
+				ErrorMessage: fmt.Sprintf("User data with the NoIdentity %v already exists", existIdMember.NoIdentity),
+		}
+	}
+	
 	file, _ := member.Open()
 
 	tempFile, err := os.CreateTemp("public", "image-*.jpg")
@@ -50,21 +66,6 @@ func (mmbUsecase *memberUsecase) InsertMember(mmb *model.Member, ctx *gin.Contex
 	fileName := tempFile.Name()
 	newFileName := strings.Split(fileName, "\\")
 
-	existPhoneNo, _ := mmbUsecase.mmbRepo.GetMemberByPhoneNumber(mmb.PhoneNo)
-	if existPhoneNo != nil {
-		return &utils.AppError{
-			ErrorCode: 1,
-			ErrorMessage: fmt.Sprintf("User data with the PhoneNo %v already exists", existPhoneNo.PhoneNo),
-		}
-	}
-	existIdMember, _ := mmbUsecase.mmbRepo.GetMemberByIdMember(mmb.NoIdentity)
-	if existIdMember != nil {
-		return &utils.AppError{
-			ErrorCode: 1,
-			ErrorMessage: fmt.Sprintf("User data with the NoIdentity %v already exists", existIdMember.NoIdentity),
-		}
-	}
-
 	CreatedAt := time.Now().UTC()
 	UpdatedAt := time.Now().UTC()
 	mmb.LoanStatus = false
@@ -76,6 +77,10 @@ func (mmbUsecase *memberUsecase) InsertMember(mmb *model.Member, ctx *gin.Contex
 	}
 
 	return mmbUsecase.mmbRepo.InsertMember(mmb)
+}
+
+func (mmbUsecase *memberUsecase) GetAllMember() ([]*model.Member, error) {
+	return mmbUsecase.mmbRepo.GetAllMember()
 }
 
 func (mmbUsecase *memberUsecase) UpdateMember(mmb *model.Member, ctx *gin.Context, req model.MemberCreateRequest) error {
@@ -144,9 +149,12 @@ func (mmbUsecase *memberUsecase) GetMemberById(id string) (*model.Member, error)
 }
 
 func (mmbUsecase *memberUsecase) DeleteMember(id string) error {
-	member, err := mmbUsecase.mmbRepo.GetMemberById(id)
-	if err != nil {
-		return fmt.Errorf("error on mmbUsecase.mmbRepo.DeleteMember: %v", err)
+	member, _ := mmbUsecase.mmbRepo.GetMemberById(id)
+	if member == nil {
+		return &utils.AppError{
+			ErrorCode: 4,
+			ErrorMessage: fmt.Sprintf("Member with id %s not found", id),
+		}
 	}
 
 	mmbUsecase.mmbRepo.DeleteMember(member)

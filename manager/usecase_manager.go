@@ -10,6 +10,7 @@ type UsecaseManager interface {
 	GetLoginUsecase() usecase.LoginUseCase
 	GetBookListUsecase() usecase.BookListUsecase
 	GetMemberUsecase() usecase.MembersUsecase
+	GetBookLoanUsecase() usecase.BookLoanUsecase
 }
 
 type usecaseManager struct {
@@ -18,13 +19,14 @@ type usecaseManager struct {
 	lgUsecase     usecase.LoginUseCase
 	bkUsecase  	usecase.BookListUsecase
 	mmbUsecase usecase.MembersUsecase
+	blUsecase usecase.BookLoanUsecase
 }
 
 var onceLoadUserUsecase sync.Once
 var onceLoadLoginUsecase sync.Once
 var onceLoadBookListUsecase sync.Once
-var onceLoadImageUsecase sync.Once
 var onceLoadMemberUsecase sync.Once
+var onceLoadBookLoanUsecase sync.Once
 
 
 func (um *usecaseManager) GetUserUsecase() usecase.UserUsecase {
@@ -55,6 +57,14 @@ func (um *usecaseManager) GetMemberUsecase() usecase.MembersUsecase {
 
 	})
 	return um.mmbUsecase
+}
+
+func (um *usecaseManager) GetBookLoanUsecase() usecase.BookLoanUsecase {
+	onceLoadBookLoanUsecase.Do(func() {
+		um.blUsecase = usecase.NewBookLoanUsecase(um.repositoryManager.GetBookLoanRepository(), um.repositoryManager.GetMemberRepository())
+
+	})
+	return um.blUsecase
 }
 
 func NewUsecaseManager(repositoryManager RepositoryManager) UsecaseManager {
