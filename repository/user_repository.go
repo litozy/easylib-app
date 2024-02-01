@@ -23,7 +23,7 @@ func (usrRepo *userRepository) GetUserById(id string) (*model.User, error) {
 	qry := utils.SELECT_USER_BY_ID
 
 	usr := &model.User{}
-	err := usrRepo.db.QueryRow(qry, id).Scan(&usr.Id, &usr.Username, &usr.Password, &usr.CreatedAt, &usr.UpdatedAt)
+	err := usrRepo.db.QueryRow(qry, id).Scan(&usr.Id, &usr.Username, &usr.Name, &usr.Password, &usr.CreatedAt, &usr.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -37,7 +37,7 @@ func (usrRepo *userRepository) GetUserByUsername(username string) (*model.User, 
 	qry := utils.SELECT_USER_BY_USERNAME
 
 	usr := &model.User{}
-	err := usrRepo.db.QueryRow(qry, username).Scan(&usr.Id, &usr.Username, &usr.Password, &usr.CreatedAt, &usr.UpdatedAt)
+	err := usrRepo.db.QueryRow(qry, username).Scan(&usr.Id, &usr.Username, &usr.Name, &usr.Password, &usr.CreatedAt, &usr.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -50,7 +50,7 @@ func (usrRepo *userRepository) GetUserByUsername(username string) (*model.User, 
 func (usrRepo *userRepository) AddUser(usr *model.User) error {
 	qry := utils.INSERT_USER
 
-	_, err := usrRepo.db.Exec(qry, &usr.Id, &usr.Username, &usr.Password, &usr.CreatedAt, &usr.UpdatedAt)
+	_, err := usrRepo.db.Exec(qry, &usr.Id, &usr.Username, &usr.Name, &usr.Password, &usr.CreatedAt, &usr.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("error on userRepository.AddUser() : %w", err)
 	}
@@ -60,7 +60,7 @@ func (usrRepo *userRepository) AddUser(usr *model.User) error {
 func (usrRepo *userRepository) UpdateUser(usr *model.User) error {
 	qry := utils.UPDATE_USER
 
-	_, err := usrRepo.db.Exec(qry, &usr.Username, &usr.Password, &usr.UpdatedAt, &usr.Id)
+	_, err := usrRepo.db.Exec(qry, &usr.Username, &usr.Name, &usr.Password, &usr.UpdatedAt, &usr.Id)
 	if err != nil {
 		return fmt.Errorf("error on userRepository.UpdateUser() : %w", err)
 	}

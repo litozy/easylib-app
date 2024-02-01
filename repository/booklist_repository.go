@@ -51,7 +51,7 @@ func (bkRepo *bookListRepository) GetAllBook() ([]*model.Book, error) {
 
 func (bkRepo *bookListRepository) InsertBook(bk *model.Book) error {
 	qry := utils.INSERT_BOOK
-	_, err := bkRepo.db.Exec(qry, bk.Id, bk.BookName, bk.CreatedAt, bk.CreatedBy, bk.Stock)
+	_, err := bkRepo.db.Exec(qry, &bk.Id, &bk.BookName, &bk.CreatedAt, &bk.CreatedBy, &bk.Stock)
 	if err != nil {
 		return fmt.Errorf("error on bookListRepository.InsertBook() : %w", err)
 	}
@@ -69,7 +69,7 @@ func (bkRepo *bookListRepository) DeleteBook(id string) error {
 
 func (bkRepo *bookListRepository) UpdateBook(bk *model.Book) error {
 	qry := utils.UPDATE_BOOK_STOCK
-	_, err := bkRepo.db.Exec(qry, bk.Stock)
+	_, err := bkRepo.db.Exec(qry, &bk.Id, &bk.BookName,&bk.Stock, &bk.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("error on bookListRepository.UpdateBook : %v", &err)
 	}

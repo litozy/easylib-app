@@ -54,6 +54,7 @@ func (loginUsecase *loginUsecase) Login(usr *model.Login, ctx *gin.Context) (*mo
 	// Login session
 	session.Set("Username", existData.Username)
 	session.Set("Id", existData.Id)
+	session.Set("Name", existData.Name)
 	session.Save()
 
 	existData.Password = ""

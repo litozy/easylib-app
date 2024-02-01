@@ -19,6 +19,7 @@ type bookLoan struct {
 }
 
 func (blRepo *bookLoan) InsertBookLoan(bl *model.BookLoan) error {
+	bk := &model.Book{}
 	tx, err := blRepo.db.Begin()
 	if err != nil {
 		return fmt.Errorf("blRepo.InsertBookLoan() Begin: %w", err)
@@ -41,7 +42,7 @@ func (blRepo *bookLoan) InsertBookLoan(bl *model.BookLoan) error {
 
 	// Decrease book stock
 	qry = utils.UPDATE_STOCK_BOOKLOAN
-	_, err = tx.Exec(qry, bl.BookId)
+	_, err = tx.Exec(qry, bk.UpdatedAt, bl.BookId)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("blRepo.InsertBookLoan() Update Book Stock: %w", err)

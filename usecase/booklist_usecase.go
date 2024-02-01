@@ -17,6 +17,7 @@ type BookListUsecase interface {
 	DeleteBook(string) error
 	UpdateBook(*model.Book) error
 }
+
 type bookListUsecase struct {
 	bkRepo repository.BookListRepository
 }
@@ -31,7 +32,7 @@ func (bkUsecase *bookListUsecase) GetAllBook() ([]*model.Book, error) {
 
 func (bkUsecase *bookListUsecase) InsertBook(bk *model.Book, ctx *gin.Context) error {
 	session := sessions.Default(ctx)
-	existSession := session.Get("Username")
+	existSession := session.Get("Name")
 
 	CreatedAt := time.Now().UTC()
 	bk.Id = utils.UuidGenerate()
@@ -45,6 +46,8 @@ func (bkUsecase *bookListUsecase) DeleteBook(id string) error {
 }
 
 func (bkUsecase *bookListUsecase) UpdateBook(bk *model.Book) error {
+	UpdatedAt := time.Now().UTC()
+	bk.UpdatedAt = UpdatedAt.Format("2006-01-02 15:04:05")
 	return bkUsecase.bkRepo.UpdateBook(bk)
 }
 

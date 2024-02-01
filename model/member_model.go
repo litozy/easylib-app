@@ -20,14 +20,14 @@ type MemberCreateRequest struct {
 	FormData []*multipart.FileHeader
 }
 
-type MemberResponse struct {
-	Id         string `json:"id"`
-	Name 	   string `json:"name"`
-	PhoneNo    string `json:"phone_no"`
-	NoIdentity string `json:"no_identity"`
-	ImagePath  string `json:"image_id"`
-	LoanStatus string `json:"loan_status"`
-	CreatedAt  string `json:"created_at"`
-	UpdatedAt  string `json:"updated_at"`
-	CreatedBy  string `json:"created_by"`
-}
+// type MemberResponse struct {
+// 	Id         string `json:"id"` 
+// 	Name 	   string `json:"name"`
+// 	PhoneNo    string `json:"phone_no"`
+// 	NoIdentity string `json:"no_identity"`
+// 	ImagePath  string `json:"image_id"`
+// 	LoanStatus string `json:"loan_status"`
+// 	CreatedAt  string `json:"created_at"`
+// 	UpdatedAt  string `json:"updated_at"`
+// 	CreatedBy  string `json:"created_by"`
+// }

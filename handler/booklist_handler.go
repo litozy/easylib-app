@@ -14,7 +14,7 @@ type BookHandler struct {
 	bkUsecase usecase.BookListUsecase
 }
 
-func (bkHandler BookHandler) GetBookById(ctx *gin.Context) {
+func (bkHandler *BookHandler) GetBookById(ctx *gin.Context) {
 	idText := ctx.Param("id")
 	if idText == "" {
 		ctx.JSON(http.StatusBadGateway, gin.H{
@@ -40,7 +40,7 @@ func (bkHandler BookHandler) GetBookById(ctx *gin.Context) {
 	})
 }
 
-func (bkHandler BookHandler) GetAllBook(ctx *gin.Context) {
+func (bkHandler *BookHandler) GetAllBook(ctx *gin.Context) {
 	bk, err := bkHandler.bkUsecase.GetAllBook()
 	if err != nil {
 		fmt.Printf("bkHandler.bkUseCase.getAllBook() : %v", err.Error())
@@ -56,7 +56,7 @@ func (bkHandler BookHandler) GetAllBook(ctx *gin.Context) {
 	})
 }
 
-func (bkHandler BookHandler) InsertBook(ctx *gin.Context) {
+func (bkHandler *BookHandler) InsertBook(ctx *gin.Context) {
 	bk := &model.Book{}
 	err := ctx.ShouldBindJSON(&bk)
 	if err != nil {
@@ -81,7 +81,7 @@ func (bkHandler BookHandler) InsertBook(ctx *gin.Context) {
 	})
 }
 
-func (bkHandler BookHandler) DeleteBook(ctx *gin.Context) {
+func (bkHandler *BookHandler) DeleteBook(ctx *gin.Context) {
 	idText := ctx.Param("id")
 	if idText == "" {
 		ctx.JSON(http.StatusBadGateway, gin.H{
@@ -107,8 +107,17 @@ func (bkHandler BookHandler) DeleteBook(ctx *gin.Context) {
 	})
 }
 
-func (bkHandler BookHandler) UpdateBook(ctx *gin.Context) {
+func (bkHandler *BookHandler) UpdateBook(ctx *gin.Context) {
 	bk := &model.Book{}
+	bk.Id = ctx.Param("id")
+	if bk.Id == "" {
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"success":      false,
+			"errorMessage": "Id must not be empty",
+		})
+		return
+	}
+	
 	err := ctx.ShouldBindJSON(&bk)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -142,6 +151,6 @@ func NewBookHandler(srv *gin.Engine, bkUsecase usecase.BookListUsecase) *BookHan
 	srv.GET("/book", middleware.RequireToken(), bkHandler.GetAllBook)
 	srv.POST("/book",middleware.RequireToken(), bkHandler.InsertBook)
 	srv.DELETE("/book/:id", middleware.RequireToken(), bkHandler.DeleteBook)
-	srv.PUT("/book", middleware.RequireToken(), bkHandler.UpdateBook)
+	srv.PUT("/book/:id", middleware.RequireToken(), bkHandler.UpdateBook)
 	return bkHandler
 }

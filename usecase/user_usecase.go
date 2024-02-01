@@ -32,13 +32,13 @@ func (usrUseCase *userUsecase) AddUser(usr *model.User) error {
 	if usr.Username == "" {
 		return &utils.AppError{
 			ErrorCode:    1,
-			ErrorMessage: "Name cannot be empty",
+			ErrorMessage: "Username cannot be empty",
 		}
 	}
 	if len(usr.Username) < 3 || len(usr.Username) > 20 {
 		return &utils.AppError{
 			ErrorCode:    2,
-			ErrorMessage: "Name must be between 3 and 20 characters",
+			ErrorMessage: "Username must be between 3 and 20 characters",
 		}
 	}
 	if usr.Password == "" {
@@ -98,6 +98,7 @@ func (usrUseCase *userUsecase) UpdateUser(usr *model.User, ctx *gin.Context) err
 	if err != nil {
 		return fmt.Errorf("userUsecase.GenerateFromPassword(): %w", err)
 	}
+
 	UpdatedAt := time.Now().UTC()
 	usr.UpdatedAt = UpdatedAt.Format("2006-01-02 15:04:05")
 	usr.Password = string(passHash)
