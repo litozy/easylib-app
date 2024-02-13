@@ -36,7 +36,7 @@ func (mmbHandler *MembersHandler) GetAllMembers(ctx *gin.Context) {
 func (mmbHandler *MembersHandler) InsertMember(ctx *gin.Context) {
 	ctx.Request.ParseMultipartForm(10 * 1024 * 1024)
 
-	req := model.MemberCreateRequest{}
+	req := model.MemberCreateRequest{} 
 	req.FormData = ctx.Request.MultipartForm.File["image"]
 
 	mmb := &model.Member{}

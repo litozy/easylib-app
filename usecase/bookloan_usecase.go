@@ -28,11 +28,10 @@ func (blUsecase *bookLoanUsecase) InsertBookLoan(bl *model.BookLoan) error {
 			ErrorMessage: fmt.Sprintf("there are no member with id : %s", bl.MemberId),
 		}
 	}
-
 	startDate := time.Now().UTC()
-	bl.Id = utils.UuidGenerate()
 	bl.StartDate = startDate.Format("2006-01-02")
-	bl.LoanStatus = "borrowing"
+	bl.LoanStatus = true
+	
 	return blUsecase.blRepo.InsertBookLoan(bl)
 }
 

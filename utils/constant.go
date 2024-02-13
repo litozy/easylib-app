@@ -31,18 +31,25 @@ const (
 	UPDATE_MEMBER          = "UPDATE images SET name = $2, phone_no = $3, no_identity = $4, image_path = $5, loan_status = $6, created_at = $7, updated_at = $8, created_by = $9 WHERE id = $1"
 
 	//BOOKLOAN
-	INSERT_BOOKLOAN        = "INSERT INTO book_loaning (id, member_id, book_id, start_date, end_date, loan_status) VALUES ($1, $2, $3, $4, $5, $6)"
-	UPDATE_STOCK_BOOKLOAN  = "UPDATE book_list SET stock = stock - 1, updated_at = ? WHERE id = ?"
-	UPDATE_MEMBER_BOOKLOAN = "UPDATE member SET loan_status = ? WHERE id = ?"
-	GET_BOOKLOAN_BY_ID     = `SELECT m.id, m.name, m.loan_status FROM book_loan AS bl
+	// INSERT_BOOKLOAN = `INSERT INTO book_loaning (id, member_id, book_id, start_date, end_date, loan_status)
+	// SELECT $1, $2, unnest($3::text[]), $4, $5, $6;`
+	INSERT_BOOKLOAN = `INSERT INTO book_loaning (id, member_id, book_id, start_date, end_date, loan_status)
+	VALUES ($1, $2, $3, $4, $5, $6)`
+	UPDATE_STOCK_BOOKLOAN            = "UPDATE book_list SET stock = stock - 1, updated_at = $2 WHERE id = $1"
+	UPDATE_MEMBER_BOOKLOAN           = "UPDATE member SET loan_status = $2 WHERE id = $1"
+	UPDATE_MEMBER_BOOKLOAN_DONE      = "UPDATE member SET loan_status = $2 WHERE id = $1"
+	GET_ALL_BOOKLOAN_STATUS          = "SELECT id, loan_status FROM book_loaning"
+	GET_BOOKLOAN_STATUS_BY_ID        = "SELECT id, member_id, loan_status FROM book_loaning WHERE id = $1"
+	GET_BOOKLOAN_STATUS_BY_MEMBER_ID = "SELECT id, member_id, loan_status FROM book_loaning WHERE member_id = $1"
+	GET_BOOKLOAN_BY_ID               = `SELECT m.id, m.name, m.loan_status FROM book_loaning AS bl
 	JOIN member AS m ON bl.member_id = m.id
 	WHERE bl.member_id = $1`
-	GET_BOOKLOAN_BY_ID_DETAIL = `SELECT b.book_name, bl.start_date, bl.end_date, bl.loan_status FROM book_loan AS bl
+	GET_BOOKLOAN_BY_ID_DETAIL = `SELECT b.book_name, bl.start_date, bl.end_date, bl.loan_status FROM book_loaning AS bl
 	JOIN book_list AS b ON bl.book_id = b.id
 	WHERE bl.member_id = $1`
-	GET_ALL_BOOKLOAN = `SELECT m.id, m.name, m.loan_status, b.book_name, bl.start_date, bl.end_date, bl.loan_status 
-	FROM book_loan AS bl
+	GET_ALL_BOOKLOAN = `SELECT m.id, m.name, m.loan_status, bl.id, b.book_name, bl.start_date, bl.end_date, bl.loan_status 
+	FROM book_loaning AS bl
 	JOIN member AS m ON bl.member_id = m.id
 	JOIN book_list AS b ON bl.book_id = b.id`
-	UPDATE_BOOKLOAN_STATUS = "UPDATE book_loan SET loan_status = $2 WHERE id = $1"
+	UPDATE_BOOKLOAN_STATUS = "UPDATE book_loaning SET loan_status = $2 WHERE id = $1"
 )

@@ -36,7 +36,7 @@ func (mmbUsecase *memberUsecase) InsertMember(mmb *model.Member, ctx *gin.Contex
 	existPhoneNo, _ := mmbUsecase.mmbRepo.GetMemberByPhoneNumber(mmb.PhoneNo)
 	if existPhoneNo != nil {
 		return &utils.AppError{
-				ErrorCode: 1,
+				ErrorCode: 1, 
 				ErrorMessage: fmt.Sprintf("User data with the PhoneNo %v already exists", existPhoneNo.PhoneNo),
 		}
 	}

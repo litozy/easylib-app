@@ -6,7 +6,7 @@ type BookLoan struct {
 	BookId     []string
 	StartDate  string
 	EndDate    string
-	LoanStatus string
+	LoanStatus bool
 }
 
 type BookLoanView struct {
@@ -17,6 +17,7 @@ type BookLoanView struct {
 }
 
 type BookLoanViewDetail struct {
+	Id         string
 	BookName   string
 	StartDate  string
 	EndDate    string

@@ -83,6 +83,15 @@ func (blHandler *BookLoanHandler) GetAllBookLoan(ctx *gin.Context) {
 
 func (blHandler *BookLoanHandler) UpdateBookLoan(ctx *gin.Context) {
 	bl := &model.BookLoan{}
+	// bl.Id = ctx.Param("id")
+	// if bl.Id == "" {
+	// 	ctx.JSON(http.StatusBadGateway, gin.H{
+	// 		"success":      false,
+	// 		"errorMessage": "Id must not be empty",
+	// 	})
+	// 	return
+	// }
+
 	err := ctx.ShouldBindJSON(&bl)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -94,7 +103,7 @@ func (blHandler *BookLoanHandler) UpdateBookLoan(ctx *gin.Context) {
 
 	err = blHandler.blUsecase.UpdateBookLoan(bl)
 	if err != nil {
-		fmt.Printf("blHandler.blUseCase.getAllBookLoan() : %v", err.Error())
+		fmt.Printf("blHandler.blUseCase.UpdateBookLoan() : %v", err.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"success":      false,
 			"errorMessage": "Terjadi kesalahan dalam memperbarui data BookLoan",
