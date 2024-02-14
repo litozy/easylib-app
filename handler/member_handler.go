@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"easylib-go/middleware"
 	"easylib-go/model"
 	"easylib-go/usecase"
 	"easylib-go/utils"
@@ -219,12 +218,14 @@ func (mmbHandler *MembersHandler) DeleteMember(ctx *gin.Context) {
 
 func NewMemberHandler(srv *gin.Engine, mmbUsecase usecase.MembersUsecase) *MembersHandler {
 	mmbHandler := &MembersHandler{mmbUsecase: mmbUsecase}
-	srv.GET("/member", middleware.RequireToken(), mmbHandler.GetAllMembers)
-	srv.GET("/memberimg/:id", middleware.RequireToken(), mmbHandler.GetMemberImageById)
-	srv.POST("/member", middleware.RequireToken(), mmbHandler.InsertMember)
-	srv.DELETE("/member/:id", middleware.RequireToken(), mmbHandler.DeleteMember)
-	srv.GET("/member/:id", middleware.RequireToken(), mmbHandler.GetMemberDataById)
-	srv.PUT("/member", middleware.RequireToken(), mmbHandler.UpdateMember)
+	srv.GET("/member", mmbHandler.GetAllMembers)
+	srv.GET("/memberimg/:id", mmbHandler.GetMemberImageById)
+	srv.POST("/member", mmbHandler.InsertMember)
+	srv.DELETE("/member/:id", mmbHandler.DeleteMember)
+	srv.GET("/member/:id", mmbHandler.GetMemberDataById)
+	srv.PUT("/member", mmbHandler.UpdateMember)
 	return mmbHandler
 
 }
+
+// middleware.RequireToken()
